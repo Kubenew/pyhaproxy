@@ -1,0 +1,32 @@
+frontends:
+  - name: "http_front"
+    bind: "0.0.0.0:9000"
+    default_backend: "app_backend"
+    rules:
+      - if: "host == example.com"
+        backend: "app_backend"
+      - if: "path_prefix == /api"
+        backend: "api_backend"
+
+backends:
+  app_backend:
+    balance: "roundrobin"
+    servers:
+      - url: "http://localhost:5000"
+      - url: "http://localhost:5001"
+
+  api_backend:
+    balance: "leastconn"
+    servers:
+      - url: "http://localhost:6000"
+      - url: "http://localhost:6001"
+
+metrics:
+  enabled: true
+  path: "/metrics"
+
+healthcheck:
+  enabled: true
+  interval_seconds: 5
+  timeout_seconds: 2
+  path: "/health"
